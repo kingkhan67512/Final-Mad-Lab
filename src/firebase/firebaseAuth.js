@@ -12,54 +12,6 @@ export const registerUser = async (email, password, userName) => {
     }
   };
  
- 
-  export const addSampleCourses = async () => {
-    const courses = [
-      {
-        title: 'Introduction to Programming',
-        description: 'Learn the basics of programming with hands-on examples.',
-      },
-      {
-        title: 'Advanced Math',
-        description: 'Deep dive into advanced mathematical concepts and techniques.',
-      },
-      {
-        title: 'Language Learning',
-        description: 'Pick up a new language with interactive exercises.',
-      },
-      {
-        title: 'Web Development Basics',
-        description: 'Learn the fundamentals of HTML, CSS, and JavaScript.',
-      },
-      {
-        title: 'Machine Learning 101',
-        description: 'An introduction to the basics of machine learning and AI.',
-      },
-    ];
-  
-    try {
-      // Loop through each course and add it to the Firestore collection
-      for (const course of courses) {
-        await addDoc(collection(db, 'courses'), course);
-      }
-      console.log('Sample courses added successfully');
-    } catch (err) {
-      console.error('Error adding sample courses: ', err);
-    }
-  };
-
-  const addCourseDetail = async (course) => {
-    const db = getFirestore();
-    try {
-      // Add the course details to the 'CourseDetail' collection
-      const docRef = await addDoc(collection(db, "CourseDetail"), course);
-      console.log("Course added with ID: ", docRef.id);
-    } catch (e) {
-      console.error("Error adding course: ", e);
-    }
-  };
-  
-  // Sample course data (based on existing courses data)
   const courseDetails = [
     {
       title: "Introduction to Programming",
@@ -82,14 +34,84 @@ export const registerUser = async (email, password, userName) => {
       duration: "5 hours",
       difficulty: "Intermediate",
     },
+    {
+      title: "Web Development",
+      description: "Build modern websites using HTML, CSS, and JavaScript.",
+      content: "This course includes hands-on projects for beginners.",
+      duration: "6 hours",
+      difficulty: "Beginner",
+    },
+    {
+      title: "Data Science",
+      description: "Learn data analysis and visualization techniques.",
+      content: "Covers Python, Pandas, and machine learning basics.",
+      duration: "10 hours",
+      difficulty: "Advanced",
+    },
+    {
+      title: "Digital Marketing",
+      description: "Master the art of online marketing and SEO.",
+      content: "Covers social media strategies and Google Ads.",
+      duration: "7 hours",
+      difficulty: "Intermediate",
+    },
+    {
+      title: "Cybersecurity Basics",
+      description: "Learn how to protect systems and data from threats.",
+      content: "Covers ethical hacking, firewalls, and encryption basics.",
+      duration: "6 hours",
+      difficulty: "Beginner",
+    },
+    {
+      title: "AI and Machine Learning",
+      description: "Dive into the world of AI and build intelligent systems.",
+      content: "Covers neural networks, TensorFlow, and deep learning basics.",
+      duration: "12 hours",
+      difficulty: "Advanced",
+    },
+    {
+      title: "Creative Writing",
+      description: "Enhance your storytelling and writing skills.",
+      content: "Covers techniques for fiction, non-fiction, and poetry.",
+      duration: "3 hours",
+      difficulty: "Beginner",
+    },
+    {
+      title: "Photography Basics",
+      description: "Learn to take stunning photos with professional techniques.",
+      content: "Covers camera settings, composition, and editing.",
+      duration: "4 hours",
+      difficulty: "Intermediate",
+    },
   ];
   
-  // Call the function to add course details
-  const populateCourseDetails = async () => {
-    for (const course of courseDetails) {
-      await addCourseDetail(course);
+  // Function to populate the `courses` and `coursedetail` collections
+  export const populateFirestore = async () => {
+    try {
+      // References to the collections
+      const courseCollectionRef = collection(db, "courses");
+      const courseDetailCollectionRef = collection(db, "coursedetail");
+  
+      // Loop through each course detail and add it to the database
+      for (const courseDetail of courseDetails) {
+        // Add course detail to `coursedetail` collection
+        const courseDetailDocRef = await addDoc(courseDetailCollectionRef, courseDetail);
+        console.log(`Course Detail added with ID: ${courseDetailDocRef.id}`);
+  
+        // Add corresponding course to `courses` collection with a reference to the course detail
+        await addDoc(courseCollectionRef, {
+          title: courseDetail.title,
+          description: courseDetail.description,
+          courseDetailRef: courseDetailDocRef, // Reference to the corresponding course detail
+        });
+  
+        console.log(`Course added with reference to detail ID: ${courseDetailDocRef.id}`);
+      }
+  
+      console.log("Courses and Course Details populated successfully!");
+    } catch (error) {
+      console.error("Error populating Firestore: ", error);
     }
   };
   
-  populateCourseDetails();  // Call this function to populate data in Firestore
-  
+  // Call the function to populate the Firestore database

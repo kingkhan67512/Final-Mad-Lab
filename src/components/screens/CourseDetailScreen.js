@@ -1,34 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Button, ActivityIndicator } from 'react-native';
-import { getFirestore, doc, getDoc } from 'firebase/firestore'; // Firestore imports
+import {db} from '../../firebase/firebaseConfig'
+import { getDoc,doc } from 'firebase/firestore'; // Firestore imports
 
 const CourseDetailScreen = ({ route, navigation }) => {
   const { courseId } = route.params; // Get the courseId from the navigation params
   const [courseDetails, setCourseDetails] = useState(null);
   const [loading, setLoading] = useState(true);
-  const db = getFirestore();
-
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        // Fetch course details from the 'CourseDetail' collection
-        const courseDocRef = doc(db, 'Courses', courseId); // Fetch using courseId
+        // Fetch course document
+        const courseDocRef = doc(db, 'courses', courseId);
         const courseDoc = await getDoc(courseDocRef);
-
+    
         if (courseDoc.exists()) {
-          setCourseDetails(courseDoc.data());
+          const courseData = courseDoc.data();    
+          // Now fetch the referenced course detail document
+          const courseDetailRef = courseData.courseDetailRef;  // Assuming 'courseDetailRef' is the field in the 'courses' document
+          const courseDetailDoc = await getDoc(courseDetailRef);
+    
+          if (courseDetailDoc.exists()) {
+            console.log('Course Detail Data:', courseDetailDoc.data());
+            // Now you can set the course and course details into your state
+            setCourseDetails(courseDetailDoc.data());
+          } else {
+            console.log('No course detail found!');
+          }
         } else {
           console.log('No such course!');
         }
       } catch (err) {
         console.error('Error fetching course details: ', err);
       }
-      setLoading(false);
+      setLoading(false)
     };
-
+  
     fetchCourseDetails();
-  }, [courseId]); // Fetch data whenever courseId changes
-
+  }, [courseId]);
+    
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet, Alert } from 'react-native';
-import { registerUser, addUserToFirestore } from '../firebase/firebaseAuth'; // Import the Firebase registration function
+import { registerUser, addUserToFirestore } from '../../firebase/firebaseAuth'; // Import the Firebase registration function
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState('');

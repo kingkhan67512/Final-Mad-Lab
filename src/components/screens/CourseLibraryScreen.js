@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, Button, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { getFirestore, collection, getDocs } from 'firebase/firestore'; // Firestore imports
 import { useNavigation } from '@react-navigation/native';
 
 const CourseLibraryScreen = ({ navigation }) => {
   const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
   const db = getFirestore();
 
   useEffect(() => {
@@ -20,10 +22,13 @@ const CourseLibraryScreen = ({ navigation }) => {
       } catch (err) {
         console.error('Error fetching courses: ', err);
       }
+      setLoading(false)
     };
     fetchCourses();
   }, []);
-
+if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.courseCard}
